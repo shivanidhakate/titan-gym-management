@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const res = await api.post('/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       if (res.data.success) {
         localStorage.setItem('token', res.data.token);
         // Load full user details
@@ -67,12 +67,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register handler
-  const register = async (name, email, password, phone, address) => {
-    setLoading(true);
-    try {
-      const res = await api.post('/api/auth/register', { name, email, password, phone, address });
-      if (res.data.success) {
-        localStorage.setItem('token', res.data.token);
+const register = async (name, email, password, phone, address) => {
+  setLoading(true);
+  try {
+    const res = await api.post('/auth/register', { 
+      name, 
+      email, 
+      password, 
+      phone, 
+      address 
+    });
+
+    if (res.data.success) {
+      localStorage.setItem('token', res.data.token);
+    }
         // Load full user details
         const meRes = await api.get('/api/auth/me');
         setUser(meRes.data.data);
