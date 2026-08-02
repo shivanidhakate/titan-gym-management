@@ -1,41 +1,12 @@
 import axios from 'axios';
 
-// In production the React app is served FROM the same Express server,
-// so relative URLs work perfectly. In development, Vite proxy handles /api → :5000.
+console.log("API URL:", import.meta.env.VITE_API_URL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
 });
-
-// Request interceptor — attach JWT token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor — handle expired tokens without forcing a redirect on public pages
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      const publicPaths = ['/', '/about', '/plans', '/trainers', '/contact', '/login', '/register', '/forgot-password', '/reset-password'];
-      const isPublicPage = publicPaths.includes(window.location.pathname);
-
-      localStorage.removeItem('token');
-      if (!isPublicPage && window.location.pathname !== '/login') {
-        window.location.href = '/login?expired=true';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default api;
