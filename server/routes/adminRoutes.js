@@ -10,6 +10,7 @@ const {
   createTrainer,
   updateTrainer,
   deleteTrainer,
+  resetUserPassword,
   getAdminPlans,
   createPlan,
   updatePlan,
@@ -31,6 +32,7 @@ router.route('/members/:id')
   .get(getMemberById)
   .put(updateMember)
   .delete(deleteMember);
+router.put('/users/:id/password', resetUserPassword);
 
 // Trainer CRUD
 router.route('/trainers')

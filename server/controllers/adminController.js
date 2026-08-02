@@ -303,7 +303,33 @@ const deleteMember = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+const resetUserPassword = async (req, res) => {
+  const { newPassword } = req.body;
 
+  try {
+    if (!newPassword) {
+      return res.status(400).json({ success: false, message: 'Please provide a new password' });
+    }
+
+    if (!global.dbConnected) {
+      const user = mockDb.users.find(u => u._id === req.params.id);
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+      const salt = bcrypt.genSaltSync(10);
+      user.password = bcrypt.hashSync(newPassword, salt);
+      return res.json({ success: true, message: `${user.role} password updated successfully` });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    user.password = newPassword;
+    await user.save();
+    return res.json({ success: true, message: `${user.role} password updated successfully` });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 // ================= TRAINER CRUD =================
 
 const getTrainers = async (req, res) => {
@@ -587,6 +613,7 @@ module.exports = {
   getMemberById,
   updateMember,
   deleteMember,
+  resetUserPassword,
   getTrainers,
   createTrainer,
   updateTrainer,

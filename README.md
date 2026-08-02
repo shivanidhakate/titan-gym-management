@@ -49,8 +49,16 @@ A full-stack **MERN** (MongoDB · Express · React · Node.js) Gym Membership Ma
 
 ### 1. Clone the Repository
 
+If you already have this project checked out locally, skip cloning and use the current folder:
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/titan-gym-management.git
+cd "C:\Users\91997\.gemini\antigravity\scratch\gym-management-system"
+```
+
+If you want to clone from GitHub instead, replace the URL below with your own repository URL after pushing the project there:
+
+```bash
+git clone https://github.com/<your-username>/titan-gym-management.git
 cd titan-gym-management
 ```
 

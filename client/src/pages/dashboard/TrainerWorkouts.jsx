@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import { Dumbbell, Plus, Trash2, Save, ChevronDown, ChevronUp, User, Loader } from 'lucide-react';
 
@@ -8,6 +9,7 @@ const emptyExercise = () => ({ name: '', sets: 3, reps: '10', weight: '', notes:
 const emptyDay = (dayName) => ({ dayName, focus: '', exercises: [] });
 
 const TrainerWorkouts = () => {
+  const location = useLocation();
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
   const [plan, setPlan] = useState({ title: '', days: [] });
@@ -22,6 +24,16 @@ const TrainerWorkouts = () => {
       if (res.data.success) setMembers(res.data.data);
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const memberId = new URLSearchParams(location.search).get('memberId');
+    if (!memberId || members.length === 0) return;
+
+    const match = members.find((member) => member._id === memberId);
+    if (match) {
+      setSelectedMember(match);
+    }
+  }, [location.search, members]);
 
   // Load existing plan when member changes
   useEffect(() => {

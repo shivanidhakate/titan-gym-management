@@ -21,13 +21,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle expired tokens
+// Response interceptor — handle expired tokens without forcing a redirect on public pages
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      const publicPaths = ['/', '/about', '/plans', '/trainers', '/contact', '/login', '/register', '/forgot-password', '/reset-password'];
+      const isPublicPage = publicPaths.includes(window.location.pathname);
+
       localStorage.removeItem('token');
-      if (window.location.pathname !== '/login') {
+      if (!isPublicPage && window.location.pathname !== '/login') {
         window.location.href = '/login?expired=true';
       }
     }

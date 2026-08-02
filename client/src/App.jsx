@@ -41,6 +41,7 @@ import ManageTrainers from './pages/dashboard/ManageTrainers';
 import ManagePlans from './pages/dashboard/ManagePlans';
 import ManageBookings from './pages/dashboard/ManageBookings';
 import ManagePayments from './pages/dashboard/ManagePayments';
+import ChangePassword from './pages/dashboard/ChangePassword';
 
 // Public Layout (Navbar + Page + Footer)
 const PublicLayout = () => {
@@ -140,6 +141,16 @@ function App() {
             <Route path="plans" element={<ManagePlans />} />
             <Route path="bookings" element={<ManageBookings />} />
             <Route path="payments" element={<ManagePayments />} />
+            <Route path="change-password" element={<ChangePassword />} />
+          </Route>
+
+          {/* Trainer Dashboard Routes */}
+          <Route path="/trainer" element={<ProtectedRoute allowedRoles={['trainer']}><DashboardLayout /></ProtectedRoute>}>
+            <Route index element={<TrainerDashboard />} />
+            <Route path="members" element={<TrainerMembers />} />
+            <Route path="bookings" element={<TrainerBookings />} />
+            <Route path="workouts" element={<TrainerWorkouts />} />
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
 
           {/* Fallback */}

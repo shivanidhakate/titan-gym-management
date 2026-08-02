@@ -6,6 +6,21 @@
   body {
     @apply bg-gymGray-900 text-gray-100 font-sans;
   }
+
+  input,
+  textarea,
+  select {
+    color: #f5f5f5 !important;
+    background-color: #0f1720 !important;
+    caret-color: #00FF66;
+    -webkit-text-fill-color: #f5f5f5;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b7280;
+    -webkit-text-fill-color: #6b7280;
+  }
 }
 
 /* Custom Glassmorphism Styles */

@@ -15,10 +15,11 @@ const protect = async (req, res, next) => {
       
       if (!global.dbConnected) {
         const { helpers } = require('../utils/mockDb');
-        req.user = helpers.findUserById(decoded.id);
-        if (!req.user) {
+        const user = helpers.findUserById(decoded.id);
+        if (!user) {
           return res.status(401).json({ success: false, message: 'Not authorized, user not found' });
         }
+        req.user = { ...user, id: user._id };
         return next();
       }
 

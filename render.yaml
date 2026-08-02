@@ -1,0 +1,31 @@
+# Render.com deployment configuration
+# Backend (Node.js/Express) service settings
+
+services:
+  - type: web
+    name: titan-gym-api
+    env: node
+    region: oregon
+    buildCommand: npm install --prefix server
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false   # Set this in Render dashboard → your MongoDB Atlas URI
+      - key: JWT_SECRET
+        sync: false   # Set this in Render dashboard
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_SECURE
+        value: false
+      - key: EMAIL_USER
+        sync: false   # Set this in Render dashboard
+      - key: EMAIL_PASS
+        sync: false   # Set this in Render dashboard
+      - key: EMAIL_FROM
+        value: "Titan Fitness Center <no-reply@titangym.com>"

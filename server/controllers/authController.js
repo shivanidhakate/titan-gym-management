@@ -4,6 +4,32 @@ const bcrypt = require('bcryptjs');
 const { mockDb, helpers } = require('../utils/mockDb');
 const { sendWelcomeEmail, sendPasswordResetEmail } = require('../utils/sendEmail');
 
+const getLegacyPasswordForRole = (role) => {
+  switch (role) {
+    case 'admin':
+      return 'admin123';
+    case 'trainer':
+      return 'trainer123';
+    case 'member':
+      return 'member123';
+    default:
+      return null;
+  }
+};
+
+const isPasswordValid = async (enteredPassword, storedPassword, role) => {
+  if (!enteredPassword || !storedPassword) return false;
+  if (storedPassword === enteredPassword) return true;
+
+  try {
+    if (await bcrypt.compare(enteredPassword, storedPassword)) return true;
+  } catch (error) {
+    // fall through to legacy fallback handling
+  }
+
+  return enteredPassword === getLegacyPasswordForRole(role);
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -86,12 +112,7 @@ const loginUser = async (req, res) => {
   try {
     if (!global.dbConnected) {
       const user = helpers.findUserByEmail(email);
-      const isMatch = user && (
-        bcrypt.compareSync(password, user.password) ||
-        (password === 'admin123' && user.role === 'admin') ||
-        (password === 'trainer123' && user.role === 'trainer') ||
-        (password === 'member123' && user.role === 'member')
-      );
+      const isMatch = user && await isPasswordValid(password, user.password, user.role);
       if (user && isMatch) {
         return res.json({
           success: true,
@@ -113,12 +134,7 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email: queryEmail });
-    const isPasswordMatch = user && (
-      (await user.matchPassword(password)) ||
-      (password === 'admin123' && user.role === 'admin') ||
-      (password === 'trainer123' && user.role === 'trainer') ||
-      (password === 'member123' && user.role === 'member')
-    );
+    const isPasswordMatch = user && await isPasswordValid(password, user.password, user.role);
 
     if (user && isPasswordMatch) {
       res.json({
@@ -143,8 +159,10 @@ const loginUser = async (req, res) => {
 // @access  Private
 const getMe = async (req, res) => {
   try {
+    const userId = req.user?._id || req.user?.id;
+
     if (!global.dbConnected) {
-      const user = helpers.findUserById(req.user.id);
+      const user = helpers.findUserById(userId);
       if (user) {
         // Populate assigned trainer info if available
         let populatedUser = { ...user };
@@ -166,7 +184,7 @@ const getMe = async (req, res) => {
     }
 
     // MongoDB Flow
-    const user = await User.findById(req.user.id).populate('assignedTrainer', 'name email profilePicture trainerSpecialties');
+    const user = await User.findById(userId).populate('assignedTrainer', 'name email profilePicture trainerSpecialties');
     if (user) {
       res.json({ success: true, data: user });
     } else {
@@ -259,10 +277,50 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Please log in first' });
+    }
+
+    if (!global.dbConnected) {
+      const user = helpers.findUserById(req.user._id || req.user.id);
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+      const isMatch = await isPasswordValid(currentPassword, user.password, user.role);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      user.password = bcrypt.hashSync(newPassword, salt);
+      return res.json({ success: true, message: 'Password updated successfully.' });
+    }
+
+    const user = await User.findById(req.user._id || req.user.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const isMatch = await isPasswordValid(currentPassword, user.password, user.role);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  changePassword
 };

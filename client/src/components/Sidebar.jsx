@@ -13,7 +13,8 @@ import {
   CreditCard,
   CheckSquare,
   LogOut,
-  Dumbbell
+  Dumbbell,
+  Lock
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -42,6 +43,7 @@ const Sidebar = () => {
     { name: 'Assigned Members', path: '/trainer/members', icon: Users },
     { name: 'Training Bookings', path: '/trainer/bookings', icon: Calendar },
     { name: 'Workout Planner', path: '/trainer/workouts', icon: Dumbbell },
+    { name: 'Change Password', path: '/trainer/change-password', icon: Lock },
   ];
 
   const adminLinks = [
@@ -51,6 +53,7 @@ const Sidebar = () => {
     { name: 'Membership Plans', path: '/admin/plans', icon: CreditCard },
     { name: 'Manage Bookings', path: '/admin/bookings', icon: Calendar },
     { name: 'Manage Payments', path: '/admin/payments', icon: History },
+    { name: 'Change Password', path: '/admin/change-password', icon: Lock },
   ];
 
   const links = user.role === 'admin' ? adminLinks : user.role === 'trainer' ? trainerLinks : memberLinks;
