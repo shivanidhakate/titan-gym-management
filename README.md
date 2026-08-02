@@ -4,8 +4,6 @@ A professional full-stack **MERN (MongoDB · Express.js · React · Node.js)** G
 
 The application provides complete gym operations management including memberships, attendance tracking, payments, trainers, workout plans, and analytics.
 
-![Titan Gym Banner](C:\Users\91997\.gemini\antigravity\scratch\gym-management-system\Screenshot 2026-08-03 003455.png)
-
 ---
 
 ## 🌐 Live Demo
