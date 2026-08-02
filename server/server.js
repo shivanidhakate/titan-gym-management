@@ -19,6 +19,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS Middleware
+// CORS Middleware
 const allowedOrigins = [
   'https://gym-management-system-eqqcukg8l-shivani-a142.vercel.app'
 ];
@@ -40,6 +41,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.options('*', cors());
 // Route Files
 const authRoutes = require('./routes/authRoutes');
 const memberRoutes = require('./routes/memberRoutes');
