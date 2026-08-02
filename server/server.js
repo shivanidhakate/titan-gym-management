@@ -17,14 +17,27 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS Middleware
-app.use(
-  cors({
-    origin: [
-      'https://gym-management-system-qtrcvbiq4-shivani-a142.vercel.app'
-    ],
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  'https://gym-management-system-cpktdu8qg-shivani-a142.vercel.app',
+  'https://gym-management-system-qtrcvbiq4-shivani-a142.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors());
 
 // Route Files
 const authRoutes = require('./routes/authRoutes');
